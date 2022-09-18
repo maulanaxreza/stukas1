@@ -141,13 +141,26 @@ def add_transaksi(request):
     return redirect ('home')
   
 def update_transaksi (request,id):
-  pelayan_obj = models.pelayan.objects.get(id_pelayan = id)
+  ''' salahnya di pelaan obj karena parameter id isinya adalah id transaksi bukan id pelayan
+      makannya pas di get di pelayan_obj dia error karena gaada id pelayan dengan id yg sesuai.
+  '''
+  # pelayan_obj = models.pelayan.objects.get(id_pelayan = id)
   transaksi_obj = models.transaksi.objects.get(id_transaksi=id)
+  # Alternatif solusi
+  pelayan_obj = models.pelayan.objects.get(id_pelayan = transaksi_obj.id_pelayan_id)
+  ''' Bisa di get dulu transaksi objnya karena parameter id yg dikirim adalah id transaksi. karena transaksi berelasi dengan entitas pelayan
+      maka bisa diambil id pelayan dari entitas transaksi dengan cara panggil objeknya terus akses atributnya contoh :
+      transaksi_obj.id_pelayanan_id --> cara bacanya dari objek transaksi_obj panggil atribut id_pelayanan_id. id_pelayanan_id didapat dari 
+      field di database. bisa disesuaikan buat nama fieldnya
+  '''
+  pelayanall = models.pelayan.objects.all()
   tanggal = datetime.strftime(transaksi_obj.tanggal, '%Y-%m-%d')
   if request.method =="GET":
     return render(request,'updatetransaksi.html',{
       'transaksi' : transaksi_obj,
-      'pelayan' : pelayan_obj,
+      # Jangan lupa karena pelayan_obj ini diambil dari metode get maka tidak perlu di for loop untuk pengaksesan tiap atributnya. 
+      # Dapat langsung dipanggil berdasarkan atributnya
+      'pelayan' : pelayanall,
       'tanggal' : tanggal
     })
   else:
